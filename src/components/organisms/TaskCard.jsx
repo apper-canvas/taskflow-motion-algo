@@ -54,8 +54,15 @@ const TaskCard = ({ task, onToggleComplete, onEdit, onDelete }) => {
                 </p>
               )}
 
-              <div className="flex items-center space-x-3 mt-3">
+<div className="flex items-center space-x-3 mt-3">
                 <PriorityBadge priority={task.priority} />
+                
+                {task.isRecurring && (
+                  <div className="flex items-center space-x-1 text-xs text-primary-600 bg-primary-50 px-2 py-1 rounded-full">
+                    <ApperIcon name="Repeat" size={12} />
+                    <span className="capitalize">{task.recurringFrequency}</span>
+                  </div>
+                )}
                 
                 {task.dueDate && (
                   <div className={cn(

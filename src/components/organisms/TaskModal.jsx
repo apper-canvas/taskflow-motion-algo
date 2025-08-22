@@ -13,12 +13,17 @@ const TaskModal = ({
   initialData = null, 
   isEditing = false 
 }) => {
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
     title: "",
     description: "",
     category: "",
     priority: "medium",
-    dueDate: ""
+    dueDate: "",
+    isRecurring: false,
+    recurringFrequency: "",
+    recurringStartDate: "",
+    recurringEndDate: "",
+    recurringEnabled: true
   })
   const [categories, setCategories] = useState([])
   const [errors, setErrors] = useState({})
@@ -28,12 +33,17 @@ const TaskModal = ({
     if (isOpen) {
       loadCategories()
       if (initialData) {
-        setFormData({
+setFormData({
           title: initialData.title || "",
           description: initialData.description || "",
           category: initialData.category || "",
           priority: initialData.priority || "medium",
-          dueDate: initialData.dueDate || ""
+          dueDate: initialData.dueDate || "",
+          isRecurring: initialData.isRecurring || false,
+          recurringFrequency: initialData.recurringFrequency || "",
+          recurringStartDate: initialData.recurringStartDate || "",
+          recurringEndDate: initialData.recurringEndDate || "",
+          recurringEnabled: initialData.recurringEnabled !== false
         })
       } else {
         setFormData({
@@ -41,7 +51,12 @@ const TaskModal = ({
           description: "",
           category: "",
           priority: "medium",
-          dueDate: ""
+          dueDate: "",
+          isRecurring: false,
+          recurringFrequency: "",
+          recurringStartDate: "",
+          recurringEndDate: "",
+          recurringEnabled: true
         })
       }
       setErrors({})
@@ -57,7 +72,7 @@ const TaskModal = ({
     }
   }
 
-  const validateForm = () => {
+const validateForm = () => {
     const newErrors = {}
     
     if (!formData.title.trim()) {
@@ -70,6 +85,25 @@ const TaskModal = ({
     
     if (!formData.priority) {
       newErrors.priority = "Please select a priority"
+    }
+    
+    // Recurring task validation
+    if (formData.isRecurring) {
+      if (!formData.recurringFrequency) {
+        newErrors.recurringFrequency = "Please select a frequency"
+      }
+      
+      if (!formData.recurringStartDate) {
+        newErrors.recurringStartDate = "Start date is required for recurring tasks"
+      }
+      
+      if (formData.recurringEndDate && formData.recurringStartDate) {
+        const startDate = new Date(formData.recurringStartDate)
+        const endDate = new Date(formData.recurringEndDate)
+        if (endDate <= startDate) {
+          newErrors.recurringEndDate = "End date must be after start date"
+        }
+      }
     }
     
     setErrors(newErrors)

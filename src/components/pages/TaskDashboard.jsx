@@ -39,11 +39,19 @@ const TaskDashboard = () => {
     }
   }
 
-  const handleTaskAdd = async (taskData) => {
+const handleTaskAdd = async (taskData) => {
     try {
       const newTask = await taskService.create(taskData)
-      setTasks(prev => [newTask, ...prev])
-      toast.success("Task created successfully!")
+      
+      // Reload all tasks to get any generated recurring tasks
+      const allTasks = await taskService.getAll()
+      setTasks(allTasks)
+      
+      if (taskData.isRecurring) {
+        toast.success(`Recurring task created! Future instances have been generated.`)
+      } else {
+        toast.success("Task created successfully!")
+      }
     } catch (err) {
       toast.error("Failed to create task")
       console.error("Error creating task:", err)
