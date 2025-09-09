@@ -1,4 +1,9 @@
-import { toast } from "react-toastify"
+import { toast } from "react-toastify";
+import React from "react";
+import Error from "@/components/ui/Error";
+
+// Custom action base URL for description generation
+const GENERATE_DESCRIPTION_URL = `https://test-api.apper.io/fn/${import.meta.env.VITE_GENERATE_TASK_DESCRIPTION}`;
 
 class TaskService {
   constructor() {
@@ -124,7 +129,7 @@ class TaskService {
         const successful = response.results.filter(r => r.success);
         const failed = response.results.filter(r => !r.success);
 
-        if (failed.length > 0) {
+if (failed.length > 0) {
           console.error(`Failed to create ${failed.length} tasks:`, failed);
           failed.forEach(record => {
             if (record.message) toast.error(record.message);
@@ -142,6 +147,35 @@ class TaskService {
       console.error("Error creating task:", error?.response?.data?.message || error);
       toast.error("Failed to create task");
       return null;
+    }
+  }
+
+  // Generate task description using OpenAI API
+  async generateDescription(title) {
+    try {
+      if (!title || typeof title !== 'string' || title.trim().length === 0) {
+        throw new Error('Title is required to generate description');
+      }
+
+      const response = await fetch(GENERATE_DESCRIPTION_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ title: title.trim() })
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to generate description');
+      }
+
+      return data.description;
+    } catch (error) {
+      console.error('Error generating task description:', error);
+      toast.error(`Failed to generate description: ${error.message}`);
+      throw error;
     }
   }
 

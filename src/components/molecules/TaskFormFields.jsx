@@ -1,12 +1,15 @@
 import Input from "@/components/atoms/Input"
 import Select from "@/components/atoms/Select"
 import Checkbox from "@/components/atoms/Checkbox"
-
+import Button from "@/components/atoms/Button"
+import ApperIcon from "@/components/ApperIcon"
 const TaskFormFields = ({ 
   formData, 
   onFormChange, 
   categories, 
-  errors = {} 
+  errors = {},
+  onGenerateDescription,
+  isGeneratingDescription = false
 }) => {
   const priorityOptions = [
     { value: "low", label: "Low Priority" },
@@ -55,10 +58,49 @@ const handleChange = (field, value) => {
         error={errors.title_c}
       />
 
-      <div>
+<div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Description
         </label>
+        <textarea
+          value={formData.description || ""}
+          onChange={(e) => handleChange("description", e.target.value)}
+          placeholder="Enter task description..."
+          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+          rows="3"
+        />
+        {errors.description && (
+          <p className="text-red-500 text-xs mt-1">{errors.description}</p>
+        )}
+      </div>
+
+      {/* Generated Description Section */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-sm font-medium text-gray-700">
+            Generated Description
+          </label>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => onGenerateDescription && onGenerateDescription(formData.title)}
+            disabled={!formData.title?.trim() || isGeneratingDescription}
+            className="text-xs"
+          >
+            {isGeneratingDescription ? (
+              <>
+                <ApperIcon name="Loader2" size={14} className="animate-spin mr-1" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <ApperIcon name="Sparkles" size={14} className="mr-1" />
+                Generate
+              </>
+            )}
+          </Button>
+        </div>
         <textarea
 value={formData.description_c || ""}
           onChange={(e) => handleChange("description_c", e.target.value)}

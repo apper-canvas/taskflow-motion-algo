@@ -5,7 +5,7 @@ import TaskFormFields from "@/components/molecules/TaskFormFields"
 import ApperIcon from "@/components/ApperIcon"
 import { taskService } from "@/services/api/taskService"
 import { categoryService } from "@/services/api/categoryService"
-
+import { toast } from "react-toastify"
 const TaskModal = ({ 
   isOpen, 
   onClose, 
@@ -28,7 +28,7 @@ const [formData, setFormData] = useState({
   const [categories, setCategories] = useState([])
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
-
+const [isGeneratingDescription, setIsGeneratingDescription] = useState(false)
   useEffect(() => {
     if (isOpen) {
       loadCategories()
@@ -46,9 +46,10 @@ setFormData({
           recurring_enabled_c: initialData.recurring_enabled_c !== undefined ? initialData.recurring_enabled_c : (initialData.recurringEnabled !== false)
         })
       } else {
-        setFormData({
+setFormData({
           title: "",
           description: "",
+          generatedDescription: "",
           category: "",
           priority: "medium",
           dueDate: "",
@@ -131,7 +132,28 @@ const taskData = {
       setIsSubmitting(false)
     }
   }
+// Handle description generation
+  const handleGenerateDescription = async (title) => {
+    if (!title?.trim()) {
+      toast.error('Please enter a task title first')
+      return
+    }
 
+    setIsGeneratingDescription(true)
+    try {
+      const generatedDescription = await taskService.generateDescription(title)
+      setFormData(prev => ({
+        ...prev,
+        generatedDescription
+      }))
+      toast.success('Description generated successfully!')
+    } catch (error) {
+      console.error('Failed to generate description:', error)
+      // Error toast is already shown in the service method
+    } finally {
+      setIsGeneratingDescription(false)
+    }
+  }
   if (!isOpen) return null
 
   return (
@@ -168,11 +190,13 @@ const taskData = {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <TaskFormFields
+<TaskFormFields
               formData={formData}
               onFormChange={setFormData}
               categories={categories}
               errors={errors}
+              onGenerateDescription={handleGenerateDescription}
+              isGeneratingDescription={isGeneratingDescription}
             />
 
             <div className="flex space-x-3 pt-4">
