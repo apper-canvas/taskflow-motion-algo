@@ -65,9 +65,9 @@ const handleTaskAdd = async (taskData) => {
         task.Id === taskId ? updatedTask : task
       ))
       
-      if (taskData.completed && !tasks.find(t => t.Id === taskId)?.completed) {
+if (taskData.completed_c && !tasks.find(t => t.Id === taskId)?.completed_c) {
         toast.success("Task completed! Great work! 🎉")
-      } else if (!taskData.completed && tasks.find(t => t.Id === taskId)?.completed) {
+      } else if (!taskData.completed_c && tasks.find(t => t.Id === taskId)?.completed_c) {
         toast.info("Task marked as incomplete")
       } else {
         toast.success("Task updated successfully!")
@@ -95,65 +95,65 @@ const handleTaskAdd = async (taskData) => {
     let filtered = tasks
 
     // Apply category filter
-    if (activeCategory === "today") {
+if (activeCategory === "today") {
       filtered = filtered.filter(task => 
-        task.dueDate && isToday(parseISO(task.dueDate)) && !task.completed
+        task.due_date_c && isToday(parseISO(task.due_date_c)) && !task.completed_c
       )
     } else if (activeCategory === "overdue") {
       filtered = filtered.filter(task => 
-        task.dueDate && isPast(parseISO(task.dueDate)) && !task.completed
+        task.due_date_c && isPast(parseISO(task.due_date_c)) && !task.completed_c
       )
-    } else if (activeCategory !== "all") {
-      filtered = filtered.filter(task => task.category === activeCategory)
+} else if (activeCategory !== "all") {
+      filtered = filtered.filter(task => task.category_c === activeCategory)
     }
 
     // Apply search filter
     if (searchTerm) {
-      const search = searchTerm.toLowerCase()
+const search = searchTerm.toLowerCase()
       filtered = filtered.filter(task =>
-        task.title.toLowerCase().includes(search) ||
-        task.description?.toLowerCase().includes(search)
+        task.title_c.toLowerCase().includes(search) ||
+        task.description_c?.toLowerCase().includes(search)
       )
     }
 
     // Sort by priority and due date
-    return filtered.sort((a, b) => {
+return filtered.sort((a, b) => {
       // Completed tasks go to bottom
-      if (a.completed !== b.completed) {
-        return a.completed ? 1 : -1
+      if (a.completed_c !== b.completed_c) {
+        return a.completed_c ? 1 : -1
       }
       
       // Sort by priority (high > medium > low)
       const priorityOrder = { high: 3, medium: 2, low: 1 }
-      const priorityDiff = (priorityOrder[b.priority] || 1) - (priorityOrder[a.priority] || 1)
+      const priorityDiff = (priorityOrder[b.priority_c] || 1) - (priorityOrder[a.priority_c] || 1)
       if (priorityDiff !== 0) return priorityDiff
       
-      // Sort by due date (closest first)
-      if (a.dueDate && b.dueDate) {
-        return new Date(a.dueDate) - new Date(b.dueDate)
+// Sort by due date (closest first)
+      if (a.due_date_c && b.due_date_c) {
+        return new Date(a.due_date_c) - new Date(b.due_date_c)
       }
-      if (a.dueDate) return -1
-      if (b.dueDate) return 1
+      if (a.due_date_c) return -1
+      if (b.due_date_c) return 1
       
-      // Sort by creation date (newest first)
-      return new Date(b.createdAt) - new Date(a.createdAt)
+      // Finally sort by creation date (newest first)
+      return new Date(b.CreatedOn) - new Date(a.CreatedOn)
     })
   }, [tasks, activeCategory, searchTerm])
 
   const taskCounts = useMemo(() => {
-    const counts = {
-      all: tasks.filter(t => !t.completed).length,
+const counts = {
+      all: tasks.filter(t => !t.completed_c).length,
       today: tasks.filter(t => 
-        t.dueDate && isToday(parseISO(t.dueDate)) && !t.completed
+        t.due_date_c && isToday(parseISO(t.due_date_c)) && !t.completed_c
       ).length,
       overdue: tasks.filter(t => 
-        t.dueDate && isPast(parseISO(t.dueDate)) && !t.completed
+        t.due_date_c && isPast(parseISO(t.due_date_c)) && !t.completed_c
       ).length
     }
 
-    categories.forEach(category => {
+categories.forEach(category => {
       counts[category.Id] = tasks.filter(t => 
-        t.category === category.Id && !t.completed
+        t.category_c === category.Id && !t.completed_c
       ).length
     })
 
@@ -162,8 +162,8 @@ const handleTaskAdd = async (taskData) => {
 
   const completionRate = useMemo(() => {
     const totalTasks = tasks.length
-    if (totalTasks === 0) return 0
-    const completedTasks = tasks.filter(t => t.completed).length
+if (totalTasks === 0) return 0
+    const completedTasks = tasks.filter(t => t.completed_c).length
     return (completedTasks / totalTasks) * 100
   }, [tasks])
 
@@ -195,8 +195,8 @@ const handleTaskAdd = async (taskData) => {
                 {activeCategory === "all" && "All Tasks"}
                 {activeCategory === "today" && "Today's Tasks"}
                 {activeCategory === "overdue" && "Overdue Tasks"}
-                {activeCategory !== "all" && activeCategory !== "today" && activeCategory !== "overdue" && 
-                  categories.find(c => c.Id === activeCategory)?.name
+{activeCategory !== "all" && activeCategory !== "today" && activeCategory !== "overdue" && 
+                  categories.find(c => c.Id === activeCategory)?.name_c
                 }
               </h2>
               <p className="text-sm text-gray-500">

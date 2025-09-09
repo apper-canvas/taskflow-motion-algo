@@ -1,185 +1,305 @@
-import taskData from "@/services/mockData/tasks.json"
+import { toast } from "react-toastify"
 
 class TaskService {
   constructor() {
-    this.tasks = [...taskData]
-  }
-
-  async delay(ms = 300) {
-    return new Promise(resolve => setTimeout(resolve, ms))
+    // Initialize ApperClient
+    const { ApperClient } = window.ApperSDK;
+    this.apperClient = new ApperClient({
+      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+    });
+    this.tableName = 'task_c';
   }
 
   async getAll() {
-    await this.delay()
-    return [...this.tasks]
+    try {
+      const params = {
+        fields: [
+          {"field": {"Name": "Id"}},
+          {"field": {"Name": "Name"}},
+          {"field": {"Name": "Tags"}},
+          {"field": {"Name": "title_c"}},
+          {"field": {"Name": "description_c"}},
+          {"field": {"Name": "category_c"}},
+          {"field": {"Name": "priority_c"}},
+          {"field": {"Name": "due_date_c"}},
+          {"field": {"Name": "completed_c"}},
+          {"field": {"Name": "completed_at_c"}},
+          {"field": {"Name": "is_recurring_c"}},
+          {"field": {"Name": "recurring_frequency_c"}},
+          {"field": {"Name": "recurring_start_date_c"}},
+          {"field": {"Name": "recurring_end_date_c"}},
+          {"field": {"Name": "recurring_enabled_c"}},
+          {"field": {"Name": "parent_task_id_c"}},
+          {"field": {"Name": "CreatedOn"}}
+        ],
+        orderBy: [{"fieldName": "CreatedOn", "sorttype": "DESC"}]
+      };
+
+      const response = await this.apperClient.fetchRecords(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return [];
+      }
+
+      return response.data || [];
+    } catch (error) {
+      console.error("Error fetching tasks:", error?.response?.data?.message || error);
+      toast.error("Failed to load tasks");
+      return [];
+    }
   }
 
   async getById(id) {
-    await this.delay()
-    const task = this.tasks.find(t => t.Id === parseInt(id))
-    if (!task) {
-      throw new Error("Task not found")
+    try {
+      const params = {
+        fields: [
+          {"field": {"Name": "Id"}},
+          {"field": {"Name": "Name"}},
+          {"field": {"Name": "Tags"}},
+          {"field": {"Name": "title_c"}},
+          {"field": {"Name": "description_c"}},
+          {"field": {"Name": "category_c"}},
+          {"field": {"Name": "priority_c"}},
+          {"field": {"Name": "due_date_c"}},
+          {"field": {"Name": "completed_c"}},
+          {"field": {"Name": "completed_at_c"}},
+          {"field": {"Name": "is_recurring_c"}},
+          {"field": {"Name": "recurring_frequency_c"}},
+          {"field": {"Name": "recurring_start_date_c"}},
+          {"field": {"Name": "recurring_end_date_c"}},
+          {"field": {"Name": "recurring_enabled_c"}},
+          {"field": {"Name": "parent_task_id_c"}},
+          {"field": {"Name": "CreatedOn"}}
+        ]
+      };
+
+      const response = await this.apperClient.getRecordById(this.tableName, id, params);
+      
+      if (!response?.data) {
+        toast.error("Task not found");
+        return null;
+      }
+
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching task ${id}:`, error?.response?.data?.message || error);
+      toast.error("Failed to load task");
+      return null;
     }
-    return { ...task }
   }
 
-async create(taskData) {
-    await this.delay()
-    const newId = Math.max(...this.tasks.map(t => t.Id), 0) + 1
-    const newTask = {
-      Id: newId,
-      ...taskData,
-      completed: false,
-      createdAt: new Date().toISOString(),
-      completedAt: null,
-      isRecurring: taskData.isRecurring || false,
-      recurringFrequency: taskData.recurringFrequency || null,
-      recurringStartDate: taskData.recurringStartDate || null,
-      recurringEndDate: taskData.recurringEndDate || null,
-      recurringEnabled: taskData.recurringEnabled || false,
-      parentTaskId: taskData.parentTaskId || null
-    }
-    
-    // Generate recurring tasks if this is a recurring task
-    const createdTasks = [newTask]
-    if (newTask.isRecurring && newTask.recurringEnabled && newTask.recurringStartDate) {
-      const recurringTasks = this.generateRecurringTasks(newTask)
-      createdTasks.push(...recurringTasks)
-    }
-    
-    // Add all tasks to the collection
-    createdTasks.forEach(task => {
-      this.tasks.unshift(task)
-    })
-    
-    return { ...newTask }
-  }
+  async create(taskData) {
+    try {
+      const params = {
+        records: [{
+          // Only include Updateable fields
+          title_c: taskData.title_c || taskData.title,
+          description_c: taskData.description_c || taskData.description,
+          category_c: parseInt(taskData.category_c || taskData.category),
+          priority_c: taskData.priority_c || taskData.priority,
+          due_date_c: taskData.due_date_c || taskData.dueDate,
+          completed_c: taskData.completed_c !== undefined ? taskData.completed_c : false,
+          completed_at_c: taskData.completed_at_c || null,
+          is_recurring_c: taskData.is_recurring_c !== undefined ? taskData.is_recurring_c : (taskData.isRecurring || false),
+          recurring_frequency_c: taskData.recurring_frequency_c || taskData.recurringFrequency,
+          recurring_start_date_c: taskData.recurring_start_date_c || taskData.recurringStartDate,
+          recurring_end_date_c: taskData.recurring_end_date_c || taskData.recurringEndDate,
+          recurring_enabled_c: taskData.recurring_enabled_c !== undefined ? taskData.recurring_enabled_c : (taskData.recurringEnabled || false),
+          parent_task_id_c: taskData.parent_task_id_c || taskData.parentTaskId || null
+        }]
+      };
 
-  generateRecurringTasks(parentTask) {
-    const tasks = []
-    const startDate = new Date(parentTask.recurringStartDate)
-    const endDate = parentTask.recurringEndDate ? new Date(parentTask.recurringEndDate) : null
-    let currentDate = new Date(startDate)
-    let taskCounter = 1
-    
-    // Generate tasks for the next 6 months or until end date
-    const maxDate = endDate || new Date(Date.now() + 6 * 30 * 24 * 60 * 60 * 1000)
-    
-    while (currentDate <= maxDate && taskCounter <= 50) { // Limit to 50 instances
-      let nextDate = new Date(currentDate)
-      
-      switch (parentTask.recurringFrequency) {
-        case 'daily':
-          nextDate.setDate(nextDate.getDate() + 1)
-          break
-        case 'weekly':
-          nextDate.setDate(nextDate.getDate() + 7)
-          break
-        case 'monthly':
-          nextDate.setMonth(nextDate.getMonth() + 1)
-          break
-        default:
-          return tasks
+      const response = await this.apperClient.createRecord(this.tableName, params);
+
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return null;
       }
-      
-      if (nextDate > maxDate) break
-      
-      const recurringTask = {
-        ...parentTask,
-        Id: Math.max(...this.tasks.map(t => t.Id), 0) + taskCounter + 1,
-        dueDate: nextDate.toISOString().split('T')[0],
-        createdAt: new Date().toISOString(),
-        completed: false,
-        completedAt: null,
-        parentTaskId: parentTask.Id
+
+      if (response.results) {
+        const successful = response.results.filter(r => r.success);
+        const failed = response.results.filter(r => !r.success);
+
+        if (failed.length > 0) {
+          console.error(`Failed to create ${failed.length} tasks:`, failed);
+          failed.forEach(record => {
+            if (record.message) toast.error(record.message);
+          });
+        }
+
+        if (successful.length > 0) {
+          toast.success("Task created successfully");
+          return successful[0].data;
+        }
       }
-      
-      tasks.push(recurringTask)
-      currentDate = new Date(nextDate)
-      taskCounter++
+
+      return null;
+    } catch (error) {
+      console.error("Error creating task:", error?.response?.data?.message || error);
+      toast.error("Failed to create task");
+      return null;
     }
-    
-    return tasks
   }
 
   async update(id, taskData) {
-    await this.delay()
-    const taskIndex = this.tasks.findIndex(t => t.Id === parseInt(id))
-    if (taskIndex === -1) {
-      throw new Error("Task not found")
+    try {
+      const params = {
+        records: [{
+          Id: parseInt(id),
+          // Only include Updateable fields
+          title_c: taskData.title_c || taskData.title,
+          description_c: taskData.description_c || taskData.description,
+          category_c: parseInt(taskData.category_c || taskData.category),
+          priority_c: taskData.priority_c || taskData.priority,
+          due_date_c: taskData.due_date_c || taskData.dueDate,
+          completed_c: taskData.completed_c !== undefined ? taskData.completed_c : taskData.completed,
+          completed_at_c: taskData.completed_at_c || taskData.completedAt,
+          is_recurring_c: taskData.is_recurring_c !== undefined ? taskData.is_recurring_c : taskData.isRecurring,
+          recurring_frequency_c: taskData.recurring_frequency_c || taskData.recurringFrequency,
+          recurring_start_date_c: taskData.recurring_start_date_c || taskData.recurringStartDate,
+          recurring_end_date_c: taskData.recurring_end_date_c || taskData.recurringEndDate,
+          recurring_enabled_c: taskData.recurring_enabled_c !== undefined ? taskData.recurring_enabled_c : taskData.recurringEnabled,
+          parent_task_id_c: taskData.parent_task_id_c !== undefined ? taskData.parent_task_id_c : taskData.parentTaskId
+        }]
+      };
+
+      const response = await this.apperClient.updateRecord(this.tableName, params);
+
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return null;
+      }
+
+      if (response.results) {
+        const successful = response.results.filter(r => r.success);
+        const failed = response.results.filter(r => !r.success);
+
+        if (failed.length > 0) {
+          console.error(`Failed to update ${failed.length} tasks:`, failed);
+          failed.forEach(record => {
+            if (record.message) toast.error(record.message);
+          });
+        }
+
+        if (successful.length > 0) {
+          toast.success("Task updated successfully");
+          return successful[0].data;
+        }
+      }
+
+      return null;
+    } catch (error) {
+      console.error("Error updating task:", error?.response?.data?.message || error);
+      toast.error("Failed to update task");
+      return null;
     }
-    
-    this.tasks[taskIndex] = {
-      ...this.tasks[taskIndex],
-      ...taskData
-    }
-    return { ...this.tasks[taskIndex] }
   }
 
   async delete(id) {
-    await this.delay()
-    const taskIndex = this.tasks.findIndex(t => t.Id === parseInt(id))
-    if (taskIndex === -1) {
-      throw new Error("Task not found")
+    try {
+      const params = {
+        RecordIds: [parseInt(id)]
+      };
+
+      const response = await this.apperClient.deleteRecord(this.tableName, params);
+
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return false;
+      }
+
+      if (response.results) {
+        const successful = response.results.filter(r => r.success);
+        const failed = response.results.filter(r => !r.success);
+
+        if (failed.length > 0) {
+          console.error(`Failed to delete ${failed.length} tasks:`, failed);
+          failed.forEach(record => {
+            if (record.message) toast.error(record.message);
+          });
+        }
+
+        if (successful.length > 0) {
+          toast.success("Task deleted successfully");
+          return true;
+        }
+      }
+
+      return false;
+    } catch (error) {
+      console.error("Error deleting task:", error?.response?.data?.message || error);
+      toast.error("Failed to delete task");
+      return false;
     }
-    
-    this.tasks.splice(taskIndex, 1)
-    return true
   }
 
+  // Additional methods for backward compatibility
   async getByCategory(categoryId) {
-    await this.delay()
-    return this.tasks.filter(t => t.category === parseInt(categoryId))
-  }
+    try {
+      const params = {
+        fields: [
+          {"field": {"Name": "Id"}},
+          {"field": {"Name": "title_c"}},
+          {"field": {"Name": "description_c"}},
+          {"field": {"Name": "category_c"}},
+          {"field": {"Name": "priority_c"}},
+          {"field": {"Name": "due_date_c"}},
+          {"field": {"Name": "completed_c"}}
+        ],
+        where: [{"FieldName": "category_c", "Operator": "EqualTo", "Values": [parseInt(categoryId)]}]
+      };
 
-  async getByPriority(priority) {
-    await this.delay()
-    return this.tasks.filter(t => t.priority === priority)
+      const response = await this.apperClient.fetchRecords(this.tableName, params);
+      return response.success ? (response.data || []) : [];
+    } catch (error) {
+      console.error("Error fetching tasks by category:", error);
+      return [];
+    }
   }
 
   async getCompleted() {
-    await this.delay()
-    return this.tasks.filter(t => t.completed)
+    try {
+      const params = {
+        fields: [
+          {"field": {"Name": "Id"}},
+          {"field": {"Name": "title_c"}},
+          {"field": {"Name": "completed_c"}},
+          {"field": {"Name": "completed_at_c"}}
+        ],
+        where: [{"FieldName": "completed_c", "Operator": "EqualTo", "Values": [true]}]
+      };
+
+      const response = await this.apperClient.fetchRecords(this.tableName, params);
+      return response.success ? (response.data || []) : [];
+    } catch (error) {
+      console.error("Error fetching completed tasks:", error);
+      return [];
+    }
   }
 
   async getPending() {
-    await this.delay()
-return this.tasks.filter(t => !t.completed)
-  }
+    try {
+      const params = {
+        fields: [
+          {"field": {"Name": "Id"}},
+          {"field": {"Name": "title_c"}},
+          {"field": {"Name": "completed_c"}}
+        ],
+        where: [{"FieldName": "completed_c", "Operator": "EqualTo", "Values": [false]}]
+      };
 
-  async toggleRecurring(id, enabled) {
-    await this.delay()
-    const taskIndex = this.tasks.findIndex(t => t.Id === parseInt(id))
-    if (taskIndex === -1) {
-      throw new Error("Task not found")
+      const response = await this.apperClient.fetchRecords(this.tableName, params);
+      return response.success ? (response.data || []) : [];
+    } catch (error) {
+      console.error("Error fetching pending tasks:", error);
+      return [];
     }
-    
-    const task = this.tasks[taskIndex]
-    if (!task.isRecurring) {
-      throw new Error("Task is not recurring")
-    }
-    
-    // Update the parent task
-    this.tasks[taskIndex].recurringEnabled = enabled
-    
-    // Handle child tasks
-    if (!enabled) {
-      // Remove future recurring instances
-      this.tasks = this.tasks.filter(t => t.parentTaskId !== parseInt(id) || t.completed)
-    } else {
-      // Regenerate recurring tasks
-      const recurringTasks = this.generateRecurringTasks(this.tasks[taskIndex])
-      recurringTasks.forEach(task => {
-        this.tasks.unshift(task)
-      })
-    }
-    
-    return { ...this.tasks[taskIndex] }
-  }
-
-  async getRecurringTasks() {
-    await this.delay()
-    return this.tasks.filter(t => t.isRecurring && !t.parentTaskId)
   }
 }
 

@@ -1,9 +1,18 @@
-import { useState } from "react"
+import { useState, useContext } from "react"
+import { useSelector } from 'react-redux'
 import { cn } from "@/utils/cn"
 import ApperIcon from "@/components/ApperIcon"
+import Button from "@/components/atoms/Button"
+import { AuthContext } from "../../App"
 
 const Layout = ({ children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const { user, isAuthenticated } = useSelector((state) => state.user)
+  const { logout } = useContext(AuthContext)
+
+  const handleLogout = () => {
+    logout()
+  }
 
   return (
     <div className="flex h-screen bg-background">
@@ -14,6 +23,24 @@ const Layout = ({ children }) => {
       >
         <ApperIcon name="Menu" size={20} />
       </button>
+
+      {/* User Info and Logout Button */}
+      {isAuthenticated && (
+        <div className="fixed top-4 right-4 z-50 flex items-center space-x-3">
+          <div className="hidden sm:block text-sm text-gray-600">
+            Welcome, {user?.firstName || user?.name || 'User'}
+          </div>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={handleLogout}
+            className="flex items-center space-x-2"
+          >
+            <ApperIcon name="LogOut" size={16} />
+            <span>Logout</span>
+          </Button>
+        </div>
+      )}
 
       {/* Mobile Sidebar Overlay */}
       {isMobileMenuOpen && (
@@ -35,10 +62,22 @@ const Layout = ({ children }) => {
               </button>
             </div>
             <div className="p-4">
-              {/* Mobile menu content will be injected here */}
-              <p className="text-gray-500 text-sm">
-                Navigation will be available when tasks are loaded
-              </p>
+              {/* Mobile menu content */}
+              <div className="space-y-4">
+                {isAuthenticated && (
+                  <div className="text-sm text-gray-600 mb-4">
+                    Welcome, {user?.firstName || user?.name || 'User'}
+                  </div>
+                )}
+                <Button 
+                  variant="ghost" 
+                  onClick={handleLogout}
+                  className="w-full justify-start"
+                >
+                  <ApperIcon name="LogOut" size={16} className="mr-2" />
+                  Logout
+                </Button>
+              </div>
             </div>
           </div>
         </div>

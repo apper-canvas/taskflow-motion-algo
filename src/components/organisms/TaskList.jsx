@@ -42,10 +42,10 @@ const TaskList = ({
         <TaskCard
           key={task.Id}
           task={task}
-          onToggleComplete={() => onTaskUpdate(task.Id, { 
+onToggleComplete={() => onTaskUpdate(task.Id, { 
             ...task, 
-            completed: !task.completed,
-            completedAt: !task.completed ? new Date().toISOString() : null
+            completed_c: !task.completed_c,
+            completed_at_c: !task.completed_c ? new Date().toISOString() : null
           })}
           onEdit={() => handleEditTask(task)}
           onDelete={() => onTaskDelete(task.Id)}

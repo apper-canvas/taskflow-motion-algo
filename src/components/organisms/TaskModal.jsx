@@ -14,16 +14,16 @@ const TaskModal = ({
   isEditing = false 
 }) => {
 const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    category: "",
-    priority: "medium",
-    dueDate: "",
-    isRecurring: false,
-    recurringFrequency: "",
-    recurringStartDate: "",
-    recurringEndDate: "",
-    recurringEnabled: true
+    title_c: "",
+    description_c: "",
+    category_c: "",
+    priority_c: "medium",
+    due_date_c: "",
+    is_recurring_c: false,
+    recurring_frequency_c: "",
+    recurring_start_date_c: "",
+    recurring_end_date_c: "",
+    recurring_enabled_c: true
   })
   const [categories, setCategories] = useState([])
   const [errors, setErrors] = useState({})
@@ -34,16 +34,16 @@ const [formData, setFormData] = useState({
       loadCategories()
       if (initialData) {
 setFormData({
-          title: initialData.title || "",
-          description: initialData.description || "",
-          category: initialData.category || "",
-          priority: initialData.priority || "medium",
-          dueDate: initialData.dueDate || "",
-          isRecurring: initialData.isRecurring || false,
-          recurringFrequency: initialData.recurringFrequency || "",
-          recurringStartDate: initialData.recurringStartDate || "",
-          recurringEndDate: initialData.recurringEndDate || "",
-          recurringEnabled: initialData.recurringEnabled !== false
+          title_c: initialData.title_c || initialData.title || "",
+          description_c: initialData.description_c || initialData.description || "",
+          category_c: initialData.category_c || initialData.category || "",
+          priority_c: initialData.priority_c || initialData.priority || "medium",
+          due_date_c: initialData.due_date_c || initialData.dueDate || "",
+          is_recurring_c: initialData.is_recurring_c !== undefined ? initialData.is_recurring_c : (initialData.isRecurring || false),
+          recurring_frequency_c: initialData.recurring_frequency_c || initialData.recurringFrequency || "",
+          recurring_start_date_c: initialData.recurring_start_date_c || initialData.recurringStartDate || "",
+          recurring_end_date_c: initialData.recurring_end_date_c || initialData.recurringEndDate || "",
+          recurring_enabled_c: initialData.recurring_enabled_c !== undefined ? initialData.recurring_enabled_c : (initialData.recurringEnabled !== false)
         })
       } else {
         setFormData({
@@ -75,33 +75,33 @@ setFormData({
 const validateForm = () => {
     const newErrors = {}
     
-    if (!formData.title.trim()) {
-      newErrors.title = "Task title is required"
+    if (!formData.title_c.trim()) {
+      newErrors.title_c = "Task title is required"
     }
     
-    if (!formData.category) {
-      newErrors.category = "Please select a category"
+    if (!formData.category_c) {
+      newErrors.category_c = "Please select a category"
     }
     
-    if (!formData.priority) {
-      newErrors.priority = "Please select a priority"
+    if (!formData.priority_c) {
+      newErrors.priority_c = "Please select a priority"
     }
     
     // Recurring task validation
-    if (formData.isRecurring) {
-      if (!formData.recurringFrequency) {
-        newErrors.recurringFrequency = "Please select a frequency"
+    if (formData.is_recurring_c) {
+      if (!formData.recurring_frequency_c) {
+        newErrors.recurring_frequency_c = "Please select a frequency"
       }
       
-      if (!formData.recurringStartDate) {
-        newErrors.recurringStartDate = "Start date is required for recurring tasks"
+      if (!formData.recurring_start_date_c) {
+        newErrors.recurring_start_date_c = "Start date is required for recurring tasks"
       }
       
-      if (formData.recurringEndDate && formData.recurringStartDate) {
-        const startDate = new Date(formData.recurringStartDate)
-        const endDate = new Date(formData.recurringEndDate)
+      if (formData.recurring_end_date_c && formData.recurring_start_date_c) {
+        const startDate = new Date(formData.recurring_start_date_c)
+        const endDate = new Date(formData.recurring_end_date_c)
         if (endDate <= startDate) {
-          newErrors.recurringEndDate = "End date must be after start date"
+          newErrors.recurring_end_date_c = "End date must be after start date"
         }
       }
     }
@@ -118,11 +118,10 @@ const validateForm = () => {
     setIsSubmitting(true)
     
     try {
-      const taskData = {
+const taskData = {
         ...formData,
-        completed: initialData?.completed || false,
-        createdAt: initialData?.createdAt || new Date().toISOString(),
-        completedAt: initialData?.completedAt || null
+        completed_c: initialData?.completed_c !== undefined ? initialData.completed_c : (initialData?.completed || false),
+        completed_at_c: initialData?.completed_at_c || initialData?.completedAt || null
       }
       
       onSubmit(taskData)
