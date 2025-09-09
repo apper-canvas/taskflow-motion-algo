@@ -11,10 +11,11 @@ const TaskFormFields = ({
   onGenerateDescription,
   isGeneratingDescription = false
 }) => {
-  const priorityOptions = [
-    { value: "low", label: "Low Priority" },
+const priorityOptions = [
+    { value: "urgent", label: "Urgent Priority" },
+    { value: "high", label: "High Priority" },
     { value: "medium", label: "Medium Priority" },
-    { value: "high", label: "High Priority" }
+    { value: "low", label: "Low Priority" }
   ]
 
   const categoryOptions = categories.map(cat => ({

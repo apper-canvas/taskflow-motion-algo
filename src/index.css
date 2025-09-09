@@ -19,6 +19,10 @@
     @apply opacity-50 line-through;
   }
   
+.priority-urgent {
+    @apply bg-gradient-to-r from-red-600 to-red-500 text-white;
+  }
+  
   .priority-high {
     @apply bg-gradient-to-r from-red-500 to-orange-500 text-white;
   }

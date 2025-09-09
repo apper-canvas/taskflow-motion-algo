@@ -11,6 +11,7 @@ const Badge = React.forwardRef(({
   
   const variants = {
     default: "bg-gray-100 text-gray-800",
+urgent: "bg-gradient-to-r from-red-600 to-red-500 text-white",
     high: "bg-gradient-to-r from-red-500 to-orange-500 text-white",
     medium: "bg-gradient-to-r from-warning to-yellow-500 text-white",
     low: "bg-gradient-to-r from-success to-green-500 text-white",

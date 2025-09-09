@@ -124,7 +124,7 @@ return filtered.sort((a, b) => {
       }
       
       // Sort by priority (high > medium > low)
-      const priorityOrder = { high: 3, medium: 2, low: 1 }
+const priorityOrder = { urgent: 4, high: 3, medium: 2, low: 1 }
       const priorityDiff = (priorityOrder[b.priority_c] || 1) - (priorityOrder[a.priority_c] || 1)
       if (priorityDiff !== 0) return priorityDiff
       

@@ -1,7 +1,8 @@
 import Badge from "@/components/atoms/Badge"
 
 const PriorityBadge = ({ priority }) => {
-  const priorities = {
+const priorities = {
+    urgent: { variant: "urgent", label: "Urgent" },
     high: { variant: "high", label: "High" },
     medium: { variant: "medium", label: "Medium" },
     low: { variant: "low", label: "Low" }
