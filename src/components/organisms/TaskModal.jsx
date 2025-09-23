@@ -23,7 +23,10 @@ const [formData, setFormData] = useState({
     recurring_frequency_c: "",
     recurring_start_date_c: "",
     recurring_end_date_c: "",
-    recurring_enabled_c: true
+    recurring_enabled_c: true,
+    generated_description_c: "",
+    subcategory_c: "",
+    urgency_c: ""
   })
   const [categories, setCategories] = useState([])
   const [errors, setErrors] = useState({})
@@ -43,7 +46,10 @@ setFormData({
           recurring_frequency_c: initialData.recurring_frequency_c || initialData.recurringFrequency || "",
           recurring_start_date_c: initialData.recurring_start_date_c || initialData.recurringStartDate || "",
           recurring_end_date_c: initialData.recurring_end_date_c || initialData.recurringEndDate || "",
-          recurring_enabled_c: initialData.recurring_enabled_c !== undefined ? initialData.recurring_enabled_c : (initialData.recurringEnabled !== false)
+          recurring_enabled_c: initialData.recurring_enabled_c !== undefined ? initialData.recurring_enabled_c : (initialData.recurringEnabled !== false),
+          generated_description_c: initialData.generated_description_c || initialData.generatedDescription || "",
+          subcategory_c: initialData.subcategory_c || initialData.subcategory || "",
+          urgency_c: initialData.urgency_c || initialData.urgency || ""
         })
       } else {
 setFormData({
@@ -141,10 +147,10 @@ const taskData = {
 
     setIsGeneratingDescription(true)
     try {
-      const generatedDescription = await taskService.generateDescription(title)
+const generatedDescription = await taskService.generateDescription(title)
       setFormData(prev => ({
         ...prev,
-        generatedDescription
+        generated_description_c: generatedDescription
       }))
       toast.success('Description generated successfully!')
     } catch (error) {

@@ -23,7 +23,7 @@ class TaskService {
           {"field": {"Name": "Id"}},
           {"field": {"Name": "Name"}},
           {"field": {"Name": "Tags"}},
-          {"field": {"Name": "title_c"}},
+{"field": {"Name": "title_c"}},
           {"field": {"Name": "description_c"}},
           {"field": {"Name": "category_c"}},
           {"field": {"Name": "priority_c"}},
@@ -36,6 +36,9 @@ class TaskService {
           {"field": {"Name": "recurring_end_date_c"}},
           {"field": {"Name": "recurring_enabled_c"}},
           {"field": {"Name": "parent_task_id_c"}},
+          {"field": {"Name": "generated_description_c"}},
+          {"field": {"Name": "subcategory_c"}},
+          {"field": {"Name": "urgency_c"}},
           {"field": {"Name": "CreatedOn"}}
         ],
         orderBy: [{"fieldName": "CreatedOn", "sorttype": "DESC"}]
@@ -60,7 +63,7 @@ class TaskService {
   async getById(id) {
     try {
       const params = {
-        fields: [
+fields: [
           {"field": {"Name": "Id"}},
           {"field": {"Name": "Name"}},
           {"field": {"Name": "Tags"}},
@@ -77,6 +80,9 @@ class TaskService {
           {"field": {"Name": "recurring_end_date_c"}},
           {"field": {"Name": "recurring_enabled_c"}},
           {"field": {"Name": "parent_task_id_c"}},
+          {"field": {"Name": "generated_description_c"}},
+          {"field": {"Name": "subcategory_c"}},
+          {"field": {"Name": "urgency_c"}},
           {"field": {"Name": "CreatedOn"}}
         ]
       };
@@ -101,7 +107,7 @@ class TaskService {
       const params = {
         records: [{
           // Only include Updateable fields
-          title_c: taskData.title_c || taskData.title,
+title_c: taskData.title_c || taskData.title,
           description_c: taskData.description_c || taskData.description,
           category_c: parseInt(taskData.category_c || taskData.category),
           priority_c: taskData.priority_c || taskData.priority,
@@ -113,7 +119,10 @@ class TaskService {
           recurring_start_date_c: taskData.recurring_start_date_c || taskData.recurringStartDate,
           recurring_end_date_c: taskData.recurring_end_date_c || taskData.recurringEndDate,
           recurring_enabled_c: taskData.recurring_enabled_c !== undefined ? taskData.recurring_enabled_c : (taskData.recurringEnabled || false),
-          parent_task_id_c: taskData.parent_task_id_c || taskData.parentTaskId || null
+          parent_task_id_c: taskData.parent_task_id_c || taskData.parentTaskId || null,
+          generated_description_c: taskData.generated_description_c || taskData.generatedDescription || null,
+          subcategory_c: taskData.subcategory_c ? parseInt(taskData.subcategory_c) : null,
+          urgency_c: taskData.urgency_c || taskData.urgency || null
         }]
       };
 
@@ -185,7 +194,7 @@ if (failed.length > 0) {
         records: [{
           Id: parseInt(id),
           // Only include Updateable fields
-          title_c: taskData.title_c || taskData.title,
+title_c: taskData.title_c || taskData.title,
           description_c: taskData.description_c || taskData.description,
           category_c: parseInt(taskData.category_c || taskData.category),
           priority_c: taskData.priority_c || taskData.priority,
@@ -197,7 +206,10 @@ if (failed.length > 0) {
           recurring_start_date_c: taskData.recurring_start_date_c || taskData.recurringStartDate,
           recurring_end_date_c: taskData.recurring_end_date_c || taskData.recurringEndDate,
           recurring_enabled_c: taskData.recurring_enabled_c !== undefined ? taskData.recurring_enabled_c : taskData.recurringEnabled,
-          parent_task_id_c: taskData.parent_task_id_c !== undefined ? taskData.parent_task_id_c : taskData.parentTaskId
+          parent_task_id_c: taskData.parent_task_id_c !== undefined ? taskData.parent_task_id_c : taskData.parentTaskId,
+          generated_description_c: taskData.generated_description_c || taskData.generatedDescription || null,
+          subcategory_c: taskData.subcategory_c ? parseInt(taskData.subcategory_c) : null,
+          urgency_c: taskData.urgency_c || taskData.urgency || null
         }]
       };
 
@@ -278,12 +290,15 @@ if (failed.length > 0) {
     try {
       const params = {
         fields: [
-          {"field": {"Name": "Id"}},
+{"field": {"Name": "Id"}},
           {"field": {"Name": "title_c"}},
           {"field": {"Name": "description_c"}},
           {"field": {"Name": "category_c"}},
           {"field": {"Name": "priority_c"}},
           {"field": {"Name": "due_date_c"}},
+          {"field": {"Name": "generated_description_c"}},
+          {"field": {"Name": "subcategory_c"}},
+          {"field": {"Name": "urgency_c"}},
           {"field": {"Name": "completed_c"}}
         ],
         where: [{"FieldName": "category_c", "Operator": "EqualTo", "Values": [parseInt(categoryId)]}]

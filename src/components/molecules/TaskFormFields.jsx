@@ -18,6 +18,13 @@ const priorityOptions = [
     { value: "low", label: "Low Priority" }
   ]
 
+  const urgencyOptions = [
+    { value: "urgent", label: "Urgent" },
+    { value: "high", label: "High" },
+    { value: "medium", label: "Medium" },
+    { value: "low", label: "Low" }
+  ]
+
   const categoryOptions = categories.map(cat => ({
 value: cat.Id,
     label: cat.name_c || cat.name
@@ -122,11 +129,21 @@ label="Category"
 
 <Select
         label="Priority"
-        value={formData.priority_c || ""}
+value={formData.priority_c || ""}
         onChange={(e) => handleChange("priority_c", e.target.value)}
         options={priorityOptions}
         placeholder="Select priority..."
         error={errors.priority_c}
+      />
+
+      {/* Urgency Field */}
+      <Select
+        label="Urgency"
+        value={formData.urgency_c || ""}
+        onChange={(e) => handleChange("urgency_c", e.target.value)}
+        options={urgencyOptions}
+        placeholder="Select urgency..."
+        error={errors.urgency_c}
       />
 
 <Input

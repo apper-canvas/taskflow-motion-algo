@@ -46,12 +46,12 @@ return (
                 {task.title_c}
               </h3>
               
-{task.description_c && (
+{(task.generated_description_c || task.description_c) && (
                 <p className={cn(
                   "text-sm text-gray-600 mt-1 line-clamp-2",
                   task.completed_c && "text-gray-400"
                 )}>
-                  {task.description_c}
+                  {task.generated_description_c || task.description_c}
                 </p>
               )}
 
