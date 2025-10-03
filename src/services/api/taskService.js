@@ -20,10 +20,10 @@ class TaskService {
     try {
       const params = {
         fields: [
-          {"field": {"Name": "Id"}},
+{"field": {"Name": "Id"}},
           {"field": {"Name": "Name"}},
           {"field": {"Name": "Tags"}},
-{"field": {"Name": "title_c"}},
+          {"field": {"Name": "title_c"}},
           {"field": {"Name": "description_c"}},
           {"field": {"Name": "category_c"}},
           {"field": {"Name": "priority_c"}},
@@ -39,6 +39,7 @@ class TaskService {
           {"field": {"Name": "generated_description_c"}},
           {"field": {"Name": "subcategory_c"}},
           {"field": {"Name": "urgency_c"}},
+          {"field": {"Name": "percentage_completed_c"}},
           {"field": {"Name": "CreatedOn"}}
         ],
         orderBy: [{"fieldName": "CreatedOn", "sorttype": "DESC"}]
@@ -64,7 +65,7 @@ class TaskService {
     try {
       const params = {
 fields: [
-          {"field": {"Name": "Id"}},
+{"field": {"Name": "Id"}},
           {"field": {"Name": "Name"}},
           {"field": {"Name": "Tags"}},
           {"field": {"Name": "title_c"}},
@@ -83,6 +84,7 @@ fields: [
           {"field": {"Name": "generated_description_c"}},
           {"field": {"Name": "subcategory_c"}},
           {"field": {"Name": "urgency_c"}},
+          {"field": {"Name": "percentage_completed_c"}},
           {"field": {"Name": "CreatedOn"}}
         ]
       };
@@ -106,8 +108,8 @@ fields: [
     try {
       const params = {
         records: [{
-          // Only include Updateable fields
-title_c: taskData.title_c || taskData.title,
+// Only include Updateable fields
+          title_c: taskData.title_c || taskData.title,
           description_c: taskData.description_c || taskData.description,
           category_c: parseInt(taskData.category_c || taskData.category),
           priority_c: taskData.priority_c || taskData.priority,
@@ -122,7 +124,8 @@ title_c: taskData.title_c || taskData.title,
           parent_task_id_c: taskData.parent_task_id_c || taskData.parentTaskId || null,
           generated_description_c: taskData.generated_description_c || taskData.generatedDescription || null,
           subcategory_c: taskData.subcategory_c ? parseInt(taskData.subcategory_c) : null,
-          urgency_c: taskData.urgency_c || taskData.urgency || null
+          urgency_c: taskData.urgency_c || taskData.urgency || null,
+          percentage_completed_c: parseInt(taskData.percentage_completed_c) || 0
         }]
       };
 
@@ -192,9 +195,9 @@ if (failed.length > 0) {
     try {
       const params = {
         records: [{
-          Id: parseInt(id),
+Id: parseInt(id),
           // Only include Updateable fields
-title_c: taskData.title_c || taskData.title,
+          title_c: taskData.title_c || taskData.title,
           description_c: taskData.description_c || taskData.description,
           category_c: parseInt(taskData.category_c || taskData.category),
           priority_c: taskData.priority_c || taskData.priority,
@@ -209,7 +212,8 @@ title_c: taskData.title_c || taskData.title,
           parent_task_id_c: taskData.parent_task_id_c !== undefined ? taskData.parent_task_id_c : taskData.parentTaskId,
           generated_description_c: taskData.generated_description_c || taskData.generatedDescription || null,
           subcategory_c: taskData.subcategory_c ? parseInt(taskData.subcategory_c) : null,
-          urgency_c: taskData.urgency_c || taskData.urgency || null
+          urgency_c: taskData.urgency_c || taskData.urgency || null,
+          percentage_completed_c: taskData.percentage_completed_c !== undefined ? parseInt(taskData.percentage_completed_c) : undefined
         }]
       };
 
@@ -299,7 +303,8 @@ title_c: taskData.title_c || taskData.title,
           {"field": {"Name": "generated_description_c"}},
           {"field": {"Name": "subcategory_c"}},
           {"field": {"Name": "urgency_c"}},
-          {"field": {"Name": "completed_c"}}
+          {"field": {"Name": "completed_c"}},
+          {"field": {"Name": "percentage_completed_c"}}
         ],
         where: [{"FieldName": "category_c", "Operator": "EqualTo", "Values": [parseInt(categoryId)]}]
       };

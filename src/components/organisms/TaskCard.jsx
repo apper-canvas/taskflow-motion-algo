@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { format, isPast, isToday, parseISO } from "date-fns";
 import ApperIcon from "@/components/ApperIcon";
+import ProgressRing from "@/components/molecules/ProgressRing";
 import PriorityBadge from "@/components/molecules/PriorityBadge";
 import Card from "@/components/atoms/Card";
 import Button from "@/components/atoms/Button";
 import Checkbox from "@/components/atoms/Checkbox";
 import { cn } from "@/utils/cn";
-
 const TaskCard = ({ task, onToggleComplete, onEdit, onDelete }) => {
   const [isCompleting, setIsCompleting] = useState(false);
 
@@ -19,21 +19,25 @@ const handleToggleComplete = () => {
     }, 300);
   };
 
-const isOverdue = task.due_date_c && isPast(parseISO(task.due_date_c)) && !task.completed_c
-  const isDueToday = task.due_date_c && isToday(parseISO(task.due_date_c))
+const isOverdue = task.due_date_c && isPast(parseISO(task.due_date_c)) && !task.completed_c;
+  const isDueToday = task.due_date_c && isToday(parseISO(task.due_date_c));
 
-return (
+  return (
     <Card className={cn(
       "task-card p-4",
       task.completed_c && "task-completed",
       isCompleting && "animate-fade-out"
     )}>
       <div className="flex items-start space-x-4">
-<Checkbox
+        <Checkbox
           checked={task.completed_c}
           onChange={handleToggleComplete}
-          animated={true}
           className="mt-1"
+        />
+        
+        <ProgressRing 
+          progress={task.percentage_completed_c || 0} 
+          size={48} 
         />
 
         <div className="flex-1 min-w-0">
@@ -105,10 +109,10 @@ return (
               </Button>
             </div>
           </div>
-        </div>
+</div>
       </div>
     </Card>
-  )
-}
+  );
+};
 
 export default TaskCard

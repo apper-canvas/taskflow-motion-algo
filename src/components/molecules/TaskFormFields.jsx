@@ -57,13 +57,25 @@ const handleChange = (field, value) => {
   }
 
   return (
-    <div className="space-y-4">
-<Input
+<div className="space-y-4">
+      <Input
         label="Task Title"
         value={formData.title_c || ""}
         onChange={(e) => handleChange("title_c", e.target.value)}
         placeholder="Enter task title..."
         error={errors.title_c}
+      />
+      
+      <Input
+        label="Progress (%)"
+        type="number"
+        min="0"
+        max="100"
+        step="1"
+        value={formData.percentage_completed_c !== undefined ? formData.percentage_completed_c : 0}
+        onChange={(e) => handleChange("percentage_completed_c", parseInt(e.target.value) || 0)}
+        placeholder="0"
+        error={errors.percentage_completed_c}
       />
 
 <div>

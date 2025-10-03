@@ -26,7 +26,8 @@ const [formData, setFormData] = useState({
     recurring_enabled_c: true,
     generated_description_c: "",
     subcategory_c: "",
-    urgency_c: ""
+    urgency_c: "",
+    percentage_completed_c: 0
   })
   const [categories, setCategories] = useState([])
   const [errors, setErrors] = useState({})
@@ -49,7 +50,8 @@ setFormData({
           recurring_enabled_c: initialData.recurring_enabled_c !== undefined ? initialData.recurring_enabled_c : (initialData.recurringEnabled !== false),
           generated_description_c: initialData.generated_description_c || initialData.generatedDescription || "",
           subcategory_c: initialData.subcategory_c || initialData.subcategory || "",
-          urgency_c: initialData.urgency_c || initialData.urgency || ""
+          urgency_c: initialData.urgency_c || initialData.urgency || "",
+          percentage_completed_c: initialData.percentage_completed_c !== undefined ? initialData.percentage_completed_c : 0
         })
       } else {
 setFormData({
@@ -63,7 +65,8 @@ setFormData({
           recurringFrequency: "",
           recurringStartDate: "",
           recurringEndDate: "",
-          recurringEnabled: true
+          recurringEnabled: true,
+          percentage_completed_c: 0
         })
       }
       setErrors({})
@@ -128,7 +131,8 @@ const validateForm = () => {
 const taskData = {
         ...formData,
         completed_c: initialData?.completed_c !== undefined ? initialData.completed_c : (initialData?.completed || false),
-        completed_at_c: initialData?.completed_at_c || initialData?.completedAt || null
+        completed_at_c: initialData?.completed_at_c || initialData?.completedAt || null,
+        percentage_completed_c: formData.percentage_completed_c !== undefined ? formData.percentage_completed_c : 0
       }
       
       onSubmit(taskData)
